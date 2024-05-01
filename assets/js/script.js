@@ -1,5 +1,6 @@
 import * as THREE from "./build/three.module.js";
 import { GLTFLoader } from "./jsm/loaders/GLTFLoader.js"
+import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 const canvas = document.querySelector("#canvas");
 let cameraMoving = true;
@@ -8,7 +9,15 @@ let model1, model2, model3;
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 const question = document.querySelector("#question");
+const board = new Array(3).fill(null).map(() => new Array(3).fill(false));
 
+for(let i=0; i< 3; i++){
+    for(let j=0; j<3; j++){
+        board[i][j] = false;
+    }
+}
+
+console.log(board);
 
 const onWindowResize = () => {
 
@@ -36,9 +45,50 @@ const onMouseClick = (event)=> {
     if (intersects.length > 0) {
         const selectedObject = intersects[0].object;
 
-        if(selectedObject.name === "A") {
-            selectedObject.material.color.set(0xff0000);
+        if(selectedObject.name === "topleft") {
+            gsap.to(model2.position, { x: -5.25, y: 5, z: -0.5 , duration: 1, ease: "power2.out" });
         }
+
+        if(selectedObject.name === "topcenter") {
+
+            gsap.to(model2.position, { x: 0, y: 5.25, z: -0.5 , duration: 1, ease: "power2.out" });
+        }
+
+        if(selectedObject.name === "topright") {
+
+            gsap.to(model2.position, { x: 5.25, y: 5.25, z: -0.5 , duration: 1, ease: "power2.out" });
+        }
+
+        if(selectedObject.name === "centerleft") {
+
+            gsap.to(model2.position, { x: -5.25, y: 0.5, z: 2 , duration: 1, ease: "power2.out" });
+        }
+
+        if(selectedObject.name === "centercenter") {
+
+            gsap.to(model2.position, { x: 0, y: 0.5, z: 2 , duration: 1, ease: "power2.out" });
+        }
+
+        if(selectedObject.name === "centerright") {
+
+            gsap.to(model2.position, { x: 5.25, y: 0.5, z: 2 , duration: 1, ease: "power2.out" });
+        }
+
+        if(selectedObject.name === "bottomleft") {
+
+            gsap.to(model2.position, { x: -5.25, y: -4, z: 4.5 , duration: 1, ease: "power2.out" });
+        }
+
+        if(selectedObject.name === "bottomcenter") {
+
+            gsap.to(model2.position, { x: 0, y: -4, z: 4.5 , duration: 1, ease: "power2.out" });
+        }
+
+        if(selectedObject.name === "bottomright") {
+
+            gsap.to(model2.position, { x: 5.25, y: -4, z: 4.5 , duration: 1, ease: "power2.out" });
+        }
+
 
         
         console.log(selectedObject);
@@ -81,7 +131,7 @@ const init = async () => {
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(0, 2000, 1000);
     directionalLight.lookAt(0, 0, 0);
-    directionalLight.intensity = 12;
+    directionalLight.intensity = 5;
     scene.add(directionalLight);
 
     const ambientlight = new THREE.AmbientLight(0xffffff, 1);
@@ -94,14 +144,29 @@ const init = async () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     canvas.appendChild(renderer.domElement);
 
-    await loadModelGLTF("A").then((resolve) => {
+    await loadModelGLTF("board").then((resolve) => {
         model1 = resolve;
-        
+        return loadModelGLTF("ficha1")
     }).then((resolve) => {
         model2 = resolve;
     });
 
+    model1.rotation.x = (-25 * Math.PI) / 180;
+    model1.rotation.y = (-90 * Math.PI) / 180;
+    model1.scale.set(1.5,1.5,1.5);
     scene.add(model1);
+
+    model2.position.set(0,0.5,2);
+    model2.scale.set(1.5,1.5,1.5);
+    model2.rotation.x = (65 * Math.PI) / 180;
+    model2.rotation.y = (-90 * Math.PI) / 180;
+    scene.add(model2);
+
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; // suaviza el movimiento de la cámara
+controls.dampingFactor = 0.25; // velocidad de suavizado
+
    
 };
 
